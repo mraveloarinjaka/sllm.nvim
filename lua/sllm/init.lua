@@ -259,10 +259,15 @@ end
 --- Add the current file (or URL) path to the context.
 ---@return nil
 function M.add_file_to_ctx()
+  local os_uname = vim.loop.os_uname()
   local buf_path = Utils.get_path_of_buffer(0)
   if buf_path then
+    local rel_path = Utils.get_relpath(buf_path)
+    if os_uname.sysname == "Windows_NT" then
+      buf_path = rel_path and rel_path or buf_path
+    end
     CtxMan.add_fragment(buf_path)
-    notify('[sllm] context +' .. Utils.get_relpath(buf_path), vim.log.levels.INFO)
+    notify('[sllm] context +' .. rel_path, vim.log.levels.INFO)
   else
     notify('[sllm] buffer does not have a path.', vim.log.levels.WARN)
   end
